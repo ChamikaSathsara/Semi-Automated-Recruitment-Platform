@@ -1,0 +1,25 @@
+{
+    "name": "mern-backend",
+    "version": "1.0.0",
+    "description": "Semi-Automated Recruitment Platform Backend",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js",
+      "dev": "nodemon server.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "mongoose": "^5.9.0",
+      "dotenv": "^8.2.0",
+      "jsonwebtoken": "^8.5.1",
+      "multer": "^1.4.2",
+      "aws-sdk": "^2.748.0",
+      "json2csv": "^5.0.6"
+    },
+    "devDependencies": {
+      "nodemon": "^2.0.3"
+    },
+    "author": "",
+    "license": "MIT"
+  }
+  
