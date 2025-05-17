@@ -7,8 +7,6 @@ const {
   applyToJob,
 } = require("../controllers/candidateController");
 
-router.use(auth, roleCheck("candidate"));
-
 router.get("/jobs", listJobs);
 router.post("/apply/:jobId", applyToJob); // Upload + score CV
 
