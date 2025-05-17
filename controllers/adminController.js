@@ -5,8 +5,14 @@ const { exportFilteredCSV, exportFilteredJSON } = require("../services/exportSer
 
 // POST /jobs - Create a new job
 exports.createJob = async (req, res) => {
-  const { title, description } = req.body;
-  const job = new Job({ title, description });
+  const { title, description, maxApplications, keywords, isActive } = req.body;
+  const job = new Job({
+    title,
+    description,
+    maxApplications,
+    keywords,
+    isActive
+  });
   await job.save();
   res.status(201).json(job);
 };
