@@ -11,38 +11,47 @@ const authRoutes = require("./routes/authRoutes");
 dotenv.config();
 const app = express();
 
-// Middleware
-app.use(cors());
+// Middleware - CORS configuration for frontend domain
+const corsOptions = {
+  origin: 'http://localhost:5173', // Replace with your frontend URL for development
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,  // Allow credentials (cookies, etc.)
+};
+
+app.use(cors(corsOptions)); // Apply CORS with specific options
+
+// Handle OPTIONS preflight requests (required for some CORS cases)
+app.options('*', cors(corsOptions)); // Allow all OPTIONS preflight requests
+
+// Middleware to parse JSON
 app.use(express.json());
 
 // Custom logging middleware using morgan
 morgan.token("req-body", (req) => JSON.stringify(req.body)); // Log request body
 
-// Custom function for logging in PowerShell style
+// Custom function for logging requests in a clean format
 const logRequest = (message) => {
-  console.log(`🌟 Incoming Request: ${message}`); // Standard log format in PowerShell
+  console.log(`REQUEST: ${message}`); // Clean format for incoming requests
 };
 
 const logResponse = (message) => {
-  console.log(`📡 Response Sent: ${message}`);
+  console.log(`RESPONSE: ${message}`); // Clean format for outgoing responses
 };
 
 // Log all incoming requests with the request body
-app.use(morgan(":method :url :status :res[content-length] - :response-time ms :req-body", {
-  stream: {
-    write: (message) => {
-      logRequest(message);
-    }
-  }
-}));
+app.use((req, res, next) => {
+  logRequest(`Method: ${req.method} | URL: ${req.originalUrl} | Body: ${JSON.stringify(req.body)}`);
+  next();
+});
 
-// Custom middleware to capture and log the response body
+// Custom middleware to capture and log the response body after the request
 app.use((req, res, next) => {
   let oldSend = res.send;
 
   // Overriding the res.send method to capture the response data
   res.send = function (data) {
-    // Log the response body here
+    // Log the response body here, after the request
     logResponse(`Status: ${res.statusCode} | Body: ${data}`);
 
     // Call the original res.send method
@@ -63,22 +72,6 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => {
-  console.log("🐱 MongoDB Connected 🐾"); // Just a simple output
-  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-}).catch(err => console.error("💥 Mongo Error:", err));
-
-// Example of logging all requests creatively
-app.use((req, res, next) => {
-  logRequest(`Method: ${req.method} | URL: ${req.originalUrl}`);
-  next();
-});
-
-// Log response after finishing request
-app.use((req, res, next) => {
-  const oldSend = res.send;
-  res.send = function (data) {
-    logResponse(`Status: ${res.statusCode} | Body: ${data}`);
-    oldSend.apply(res, arguments);
-  };
-  next();
-});
+  console.log("MongoDB Connected");
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}).catch(err => console.error("MongoDB Error:", err));
